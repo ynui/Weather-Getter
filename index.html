@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="./jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Getter</title>
+</head>
+
+<body>
+    <div id="content">
+        <div class="container">
+            <h1>Weather Getter</h1>
+            <div id="input">
+                <input id="cityName" type="text" placeholder="Search any city...">
+                <button type="button" class="btn btn-secondary" onclick="userCityInput()">Show Weather!</button>
+            </div>
+            <div class="row">
+                <div id="preset1" class="col-xs-8 col-md-3">
+                    <div id="preset1" class="container">
+                        <div class="col-xs-12 col-md-12">
+                            <div id="loader1" style="visibility: hidden;">
+                                <div class="spinner-border text-secondary"></div>
+                                <span> Hope it's breezy!</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="location1" class="location" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <img src="" alt="" id="icon1" width="88" height="88">
+                                <br>
+                                <p id="statePhrase1" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="temp1" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="tempFeels1" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="windspeed1" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="humidity1" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="pressure1" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="uvIndex1" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="cloudCover1" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="visibility1" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="sunrise1" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="sunset1" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="maxTemp1" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="minTemp1" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="termo1" class="col-xs-4 col-md-1" style="visibility: hidden;">
+                    <div>
+                        <div id="termometer">
+                            <div id="temperature1" style="height:0" data-value="0°C"></div>
+                            <div id="graduations1"></div>
+                            <input type="range1" style="visibility: hidden;">
+                        </div>
+                    </div>
+                </div>
+                <div id="preset2" class="col-xs-8 col-md-3">
+                    <div id="preset2" class="container">
+                        <div class="col-xs-12 col-md-12 loaders">
+                            <div id="loader2" style="visibility: hidden;">
+                                <div class="spinner-border text-secondary"></div>
+                                <span> Hope it's cloudy!</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="location2" class="location" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <img src="" alt="" id="icon2" width="88" height="88">
+                                <br>
+                                <p id="statePhrase2" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="temp2" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="tempFeels2" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="windspeed2" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="humidity2" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="pressure2" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="uvIndex2" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="cloudCover2" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="visibility2" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="sunrise2" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="sunset2" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="maxTemp2" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="minTemp2" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="termo2" class="col-xs-4 col-md-1" style="visibility: hidden;">
+                    <div>
+                        <div id="termometer">
+                            <div id="temperature2" style="height:0" data-value="0°C"></div>
+                            <div id="graduations2"></div>
+                            <input type="range2" style="visibility: hidden;">
+                        </div>
+                    </div>
+                </div>
+                <div id="userRequest" class="col-xs-8 col-md-3">
+                    <div id="userRequest" class="container">
+                        <div class="col-xs-12 col-md-12 loaders">
+                            <div id="loader3" style="visibility: hidden;">
+                                <div class="spinner-border text-secondary"></div>
+                                <span> Hope it's sunny!</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="location3" class="location" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <img src="" alt="" id="icon3" width="88" height="88">
+                                <br>
+                                <p id="statePhrase3" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="temp3" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="tempFeels3" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="windspeed3" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="humidity3" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="pressure3" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="uvIndex3" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="cloudCover3" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="visibility3" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="sunrise3" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="sunset3" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-6">
+                                <p id="maxTemp3" />
+                            </div>
+                            <div class="col-xs-6 col-md-6">
+                                <p id="minTemp3" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="termo3" class="col-xs-4 col-md-1" style="visibility: hidden;">
+                    <div>
+                        <div id="termometer">
+                            <div id="temperature3" style="height:0" data-value="0°C"></div>
+                            <div id="graduations3"></div>
+                            <input type="range3" style="visibility: hidden;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="footer">
+            <span>Data is taken from accuweather.com</span>
+            <span style="float: right;">Yuval Niezni - ynui12@gmail.com</span>
+        </div>
+    </div>
+</body>
+<script src="./index.js"></script>
+
+</html>
