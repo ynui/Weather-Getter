@@ -67,8 +67,13 @@ server.get('/getWeatherData', (request, response) => {
 
 async function getDataByCity(cityName) {
     if(isCityDataRelevant(cityName)) return getDatabaseDataByCity(cityName);
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
+	const browser = await puppeteer.launch({
+		args: [
+			'--no-sandbox',
+			'--disable-setuid-sandbox',
+		],
+	});    
+	const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
     try {
         let URL = await getUrlByCity(cityName, page);
