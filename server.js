@@ -54,6 +54,7 @@ server.get('/getWeatherData', (request, response) => {
         try {
             const weatherData = await getDataByCity(cityName);
             response.json(weatherData);
+            //console.log('Succesfull request:', cityName, weatherData);
         } catch (ex) {
             console.log(ex);
             response.status(500).send();
@@ -63,7 +64,7 @@ server.get('/getWeatherData', (request, response) => {
 });
 
 async function getDataByCity(cityName) {
-    if(isCityDataRelevant(cityName)) return Map_UrlToData.get(Map_CitynameToUrl.get(cityName));
+    if(isCityDataRelevant(cityName)) return getDatabaseDataByCity(cityName);
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
@@ -81,7 +82,7 @@ async function getDataByCity(cityName) {
 async function getDataFromURL(URL, page) {
     if (isUrlDataRelevant(URL)) {
         const dataFromDatabase = Map_UrlToData.get(URL);
-        console.log(dataFromDatabase.location, 'Data from database: ', dataFromDatabase);
+        //console.log(dataFromDatabase.location, 'Data from database: ', dataFromDatabase);
         return dataFromDatabase;
     }
     const timestramp = Date.now();
@@ -129,7 +130,7 @@ async function getDataFromURL(URL, page) {
         })
         data.URL = URL;
         data.TIME = timestramp;
-        console.log(URL, 'New Data:', data);
+        // console.log(URL, 'New Data:', data);
         Map_UrlToData.set(URL, data);
         return data;
     } catch (ex) {
@@ -137,9 +138,13 @@ async function getDataFromURL(URL, page) {
     }
 }
 
+function getDatabaseDataByCity(cityName){
+    return Map_UrlToData.get(Map_CitynameToUrl.get(cityName));
+}
+
 async function getUrlByCity(cityName, page) {
     if (Map_CitynameToUrl.has(cityName)) {
-        console.log(cityName, 'URL from database:', Map_CitynameToUrl.get(cityName));
+        // console.log(cityName, 'URL from database:', Map_CitynameToUrl.get(cityName));
         return Map_CitynameToUrl.get(cityName);
     }
     try {
@@ -161,7 +166,7 @@ async function getUrlByCity(cityName, page) {
         await page.waitForNavigation();
         const URL = page.url();
         Map_CitynameToUrl.set(cityName, URL)
-        console.log(cityName, 'New URL:', URL);
+        //console.log(cityName, 'New URL:', URL);
         return URL;
     }
     catch (ex) {
