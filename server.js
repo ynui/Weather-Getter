@@ -67,9 +67,12 @@ server.get('/getWeatherData', (request, response) => {
 
 async function getDataByCity(cityName) {
     if(isCityDataRelevant(cityName)) return getDatabaseDataByCity(cityName);
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+        args : [
+            '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+        ]
+    });
     const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
     try {
         let URL = await getUrlByCity(cityName, page);
         let weatherData = await getDataFromURL(URL, page);
@@ -87,6 +90,8 @@ async function getDataFromURL(URL, page) {
         //console.log(dataFromDatabase.location, 'Data from database: ', dataFromDatabase);
         return dataFromDatabase;
     }
+    if(page.url() != URL)
+        await page.goto(URL, { waitUntil: 'domcontentloaded' });
     const timestramp = Date.now();
     try {
         await page.waitForSelector('.weather-icon.icon');
