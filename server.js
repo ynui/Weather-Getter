@@ -55,8 +55,10 @@ server.get('/getWeatherData', (request, response) => {
             const weatherData = await getDataByCity(cityName);
             response.json(weatherData);
             //console.log('Succesfull request:', cityName, weatherData);
+            console.log(cityName, 'request succeeded');
         } catch (ex) {
-            console.log(ex);
+            //console.log(ex);
+			console.log(cityName, 'request failed');
             response.status(500).send();
         }
     };
