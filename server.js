@@ -4,13 +4,14 @@ const path = require('path');
 const server = express();
 const PORT = process.env.PORT || 3000;
 
+
 const BASE_URL = "https://www.accuweather.com/"
 
 const MINUTE = 60 * 1000;
 const RELEVANT_TIME = 5 * MINUTE;
 
-let urlMap = new Map();
-let dataMap = new Map();
+let Map_CitynameToUrl = new Map();
+let Map_UrlToData = new Map();
 
 
 server.get('/', (request, response) => {
@@ -49,38 +50,43 @@ server.get('/getWeatherData', (request, response) => {
     response.setHeader('Content-Type', 'application/json');
     const cityName = request.param('cityName').toLowerCase();
     console.log('Received request:', cityName);
-    if (urlMap.has(cityName)) {
-        console.log('Procceced url (from database): ', urlMap.get(cityName));
-        getDataFromExistingURL(urlMap.get(cityName), response)
-    } else {
-        getRequiredURL(cityName, response);
-    }
+    const getWeatherData = async (cityName) => {
+        try {
+            const weatherData = await getDataByCity(cityName);
+            response.json(weatherData);
+        } catch (ex) {
+            console.log(ex);
+            response.status(500).send();
+        }
+    };
+    getWeatherData(cityName);
 });
 
-async function getDataFromExistingURL(URL, response){
-    if (isDataRelevant(URL)) {
-        console.log('Procceced data (from database):\n', dataMap.get(URL));
-        response.json(dataMap.get(URL));
-    }
-    else {
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
-        try {
-            await page.goto(URL, { waitUntil: 'domcontentloaded' })
-            await page.waitForSelector('.weather-icon.icon');
-        } catch(ex){
-            sendError("Connection Error....", ex, response);
-            return;
-        }
-        getDataFromURL(browser, page, URL, response);
+async function getDataByCity(cityName) {
+    if(isCityDataRelevant(cityName)) return Map_UrlToData.get(Map_CitynameToUrl.get(cityName));
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
+    try {
+        let URL = await getUrlByCity(cityName, page);
+        let weatherData = await getDataFromURL(URL, page);
+        return weatherData;
+    } catch (ex) {
+        throw ex;
+    } finally {
+        browser.close();
     }
 }
 
-async function getDataFromURL(browser, page, URL, response) {
+async function getDataFromURL(URL, page) {
+    if (isUrlDataRelevant(URL)) {
+        const dataFromDatabase = Map_UrlToData.get(URL);
+        console.log(dataFromDatabase.location, 'Data from database: ', dataFromDatabase);
+        return dataFromDatabase;
+    }
     const timestramp = Date.now();
-    await page.waitForSelector('.weather-icon.icon');
     try {
+        await page.waitForSelector('.weather-icon.icon');
         const data = await page.evaluate(() => {
             let location = document.querySelector('.recent-location-display-label').firstElementChild.innerText;
             let country = document.querySelector('.recent-locations-label').innerText
@@ -123,21 +129,19 @@ async function getDataFromURL(browser, page, URL, response) {
         })
         data.URL = URL;
         data.TIME = timestramp;
-        console.log('Data collected:\n', data);
-        dataMap.set(URL, data);
-        response.json(data);
-        await browser.close();
+        console.log(URL, 'New Data:', data);
+        Map_UrlToData.set(URL, data);
+        return data;
     } catch (ex) {
-        sendError('Error occured while getting data from ' + URL, ex, response);
-        await browser.close();
-        return;
+        throw 'Error getting data from ' + URL;
     }
 }
 
-async function getRequiredURL(cityName, response) {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
+async function getUrlByCity(cityName, page) {
+    if (Map_CitynameToUrl.has(cityName)) {
+        console.log(cityName, 'URL from database:', Map_CitynameToUrl.get(cityName));
+        return Map_CitynameToUrl.get(cityName);
+    }
     try {
         await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
         await page.waitForSelector('input[class="search-input"]');
@@ -145,11 +149,6 @@ async function getRequiredURL(cityName, response) {
         await page.type('input[class="search-input"]', cityName);
         await page.keyboard.press('Enter');
         await page.waitForNavigation();
-    } catch (ex) {
-        sendError("Connection Error....", ex, response);
-        return;
-    }
-    try {
         await page.evaluate(() => {
             if (document.querySelector('.search-results').childElementCount > 0) {
                 document.querySelector('.search-results').firstElementChild.click();
@@ -160,32 +159,28 @@ async function getRequiredURL(cityName, response) {
             document.querySelector('.panel.panel-fade-in.card').click();
         });
         await page.waitForNavigation();
-        let URL = page.url()
-        console.log('Procceced url: ', URL);
-        urlMap.set(cityName, URL);
-        if (isDataRelevant(URL)) {
-            console.log('Procceced data (from database):\n', dataMap.get(URL));
-            response.json(dataMap.get(URL));
-        }
-        else {
-            getDataFromURL(browser, page, URL, response);
-        }
-    } catch (ex) {
-        sendError(cityName + " was not found", ex, response);
-        await browser.close();
+        const URL = page.url();
+        Map_CitynameToUrl.set(cityName, URL)
+        console.log(cityName, 'New URL:', URL);
+        return URL;
+    }
+    catch (ex) {
+        throw 'Error getting URL for: ' + cityName;
     }
 }
 
-function sendError(msg, ex, response) {
-    console.log(msg);
-    console.log(ex);
-    response.status(500).send();
+
+function isCityDataRelevant(cityName) {
+    if(Map_CitynameToUrl.has(cityName)){
+        return(isUrlDataRelevant(Map_CitynameToUrl.get(cityName)));
+    }
+    else return false;
 }
 
 //data is considered relevant if it was taken in the last "RELEVANT_TIME"
-function isDataRelevant(URL) {
-    if (!dataMap.has(URL)) return false;
-    let timePassedSinceLastUpdate = Date.now() - dataMap.get(URL).TIME;
+function isUrlDataRelevant(URL) {
+    if (!Map_UrlToData.has(URL)) return false;
+    let timePassedSinceLastUpdate = Date.now() - Map_UrlToData.get(URL).TIME;
     if (timePassedSinceLastUpdate < RELEVANT_TIME) return true;
     else return false;
 }
