@@ -13,8 +13,7 @@ let userLastInput;
 
 function showWheatherData(data, position) {
     if (JSON.stringify(data) == JSON.stringify(WeatherData[position - 1])) {
-        console.log('Same data received\n', data);
-        console.log(data);
+        //console.log('Same data received', data);
         return;
     }
     WeatherData[position - 1] = data;
