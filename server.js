@@ -18,6 +18,14 @@ server.get('/', (request, response) => {
     response.sendFile(path.join(__dirname + '/index.html'));
 });
 
+server.get('/index.js', (request, response) => {
+    response.sendFile(path.join(__dirname + '/index.js'));
+});
+
+server.get('/jquery-3.4.1.min.js', (request, response) => {
+    response.sendFile(path.join(__dirname + '/src/jquery-3.4.1.min.js'));
+});
+
 server.get('/style.css', (request, response) => {
     response.sendFile(path.join(__dirname + '/src/style.css'));
 });
@@ -28,14 +36,6 @@ server.get('/bootstrap.min.css', (request, response) => {
 
 server.get('/background.jpg', (request, response) => {
     response.sendFile(path.join(__dirname + '/src/background.jpg'));
-});
-
-server.get('/index.js', (request, response) => {
-    response.sendFile(path.join(__dirname + '/src/index.js'));
-});
-
-server.get('/jquery-3.4.1.min.js', (request, response) => {
-    response.sendFile(path.join(__dirname + '/src/jquery-3.4.1.min.js'));
 });
 
 server.get('/favicon.ico', (request, response) => {
@@ -56,19 +56,19 @@ server.get('/getWeatherData', (request, response) => {
             response.json(weatherData);
             //console.log('Succesfull request:', cityName, weatherData);
             console.log(cityName, 'request succeeded');
-        } catch (ex) {
-            //console.log(ex);
-			console.log(cityName, 'request failed');
+        } catch (err) {
             response.status(500).send();
+            // console.log(err);
+            console.log(cityName, 'request failed');
         }
     };
     getWeatherData(cityName);
 });
 
 async function getDataByCity(cityName) {
-    if(isCityDataRelevant(cityName)) return getDatabaseDataByCity(cityName);
+    if (isCityDataRelevant(cityName)) return getDatabaseDataByCity(cityName);
     const browser = await puppeteer.launch({
-        args : [
+        args: [
             '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
         ]
     });
@@ -77,21 +77,21 @@ async function getDataByCity(cityName) {
         let URL = await getUrlByCity(cityName, page);
         let weatherData = await getDataFromURL(URL, page);
         return weatherData;
-    } catch (ex) {
+    } catch (err) {
         throw ex;
     } finally {
-        browser.close();
+        await page.close();
+        await browser.close();
     }
 }
 
 async function getDataFromURL(URL, page) {
     if (isUrlDataRelevant(URL)) {
-        const dataFromDatabase = Map_UrlToData.get(URL);
-        //console.log(dataFromDatabase.location, 'Data from database: ', dataFromDatabase);
-        return dataFromDatabase;
+        return Map_UrlToData.get(URL);
     }
-    if(page.url() != URL)
+    if (page.url() != URL) {
         await page.goto(URL, { waitUntil: 'domcontentloaded' });
+    }
     const timestramp = Date.now();
     try {
         await page.waitForSelector('.weather-icon.icon');
@@ -140,18 +140,17 @@ async function getDataFromURL(URL, page) {
         // console.log(URL, 'New Data:', data);
         Map_UrlToData.set(URL, data);
         return data;
-    } catch (ex) {
+    } catch (err) {
         throw 'Error getting data from ' + URL;
     }
 }
 
-function getDatabaseDataByCity(cityName){
+function getDatabaseDataByCity(cityName) {
     return Map_UrlToData.get(Map_CitynameToUrl.get(cityName));
 }
 
 async function getUrlByCity(cityName, page) {
     if (Map_CitynameToUrl.has(cityName)) {
-        // console.log(cityName, 'URL from database:', Map_CitynameToUrl.get(cityName));
         return Map_CitynameToUrl.get(cityName);
     }
     try {
@@ -176,15 +175,15 @@ async function getUrlByCity(cityName, page) {
         //console.log(cityName, 'New URL:', URL);
         return URL;
     }
-    catch (ex) {
+    catch (err) {
         throw 'Error getting URL for: ' + cityName;
     }
 }
 
 
 function isCityDataRelevant(cityName) {
-    if(Map_CitynameToUrl.has(cityName)){
-        return(isUrlDataRelevant(Map_CitynameToUrl.get(cityName)));
+    if (Map_CitynameToUrl.has(cityName)) {
+        return (isUrlDataRelevant(Map_CitynameToUrl.get(cityName)));
     }
     else return false;
 }
