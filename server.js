@@ -146,9 +146,6 @@ async function getDataFromURL(URL, page) {
     }
 }
 
-function getDatabaseDataByCity(cityName) {
-    return Map_UrlToData.get(Map_CitynameToUrl.get(cityName));
-}
 
 async function getUrlByCity(cityName, page) {
     if (Map_CitynameToUrl.has(cityName)) {
@@ -181,6 +178,9 @@ async function getUrlByCity(cityName, page) {
     }
 }
 
+function getDatabaseDataByCity(cityName) {
+    return Map_UrlToData.get(Map_CitynameToUrl.get(cityName));
+}
 
 function isCityDataRelevant(cityName) {
     if (Map_CitynameToUrl.has(cityName)) {
