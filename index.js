@@ -32,15 +32,12 @@ function showWheatherData(data, position) {
     document.getElementById('sunset' + position).innerText = "Sunset: " + data.sunset;
     document.getElementById('maxTemp' + position).innerText = "Highest: " + data.maxTemp + DEGREE_SYMBOL;
     document.getElementById('minTemp' + position).innerText = "Lowest: " + data.minTemp + DEGREE_SYMBOL;
-    showTermo(position, data.temp);
+    setAndShowTermo(position, data.temp);
 }
 
-function showTermo(position, temp) {
+function setAndShowTermo(position, temp) {
     document.getElementById('termo' + position).style.visibility = "visible";
-    let inputRangeID = "input[type='range" + position + "']";
-    let range = document.querySelector(inputRangeID);
-    range.value = temp;
-    setTimeout(showTermoTemp, 888, position);
+    setTimeout(setAndShowTermoTemp, 888, position, temp);
 }
 
 function setRecall(position) {
@@ -50,16 +47,14 @@ function setRecall(position) {
         userRequestRecall = setTimeout(getWeatherData, RELEVANT_TIME, userLastInput, position);
 }
 
-function showTermoTemp(ID) {
+function setAndShowTermoTemp(ID, temp) {
     const termoMinTemp = -15;
     const termoMaxTemp = 40;
-    let inputRangeID = "input[type='range" + ID + "']"
-    const range = document.querySelector(inputRangeID);
     const temperature = document.getElementById("temperature" + ID);
-    if (range.value >= termoMaxTemp) temperature.style.height = 100 + "%";
-    else if (range.value <= termoMinTemp) temperature.style.height = 0 + "%";
-    else temperature.style.height = (range.value - termoMinTemp) / (termoMaxTemp - termoMinTemp) * 100 + "%";
-    temperature.dataset.value = range.value + DEGREE_SYMBOL;
+    if (temp >= termoMaxTemp) temperature.style.height = 100 + "%";
+    else if (temp <= termoMinTemp) temperature.style.height = 0 + "%";
+    else temperature.style.height = (temp - termoMinTemp) / (termoMaxTemp - termoMinTemp) * 100 + "%";
+    temperature.dataset.value = temp + DEGREE_SYMBOL;
 }
 
 function getWeatherData(city, position) {
