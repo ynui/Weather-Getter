@@ -13,6 +13,7 @@ const RELEVANT_TIME = 5 * MINUTE;
 let Map_CitynameToUrl = new Map();
 let Map_UrlToData = new Map();
 
+
 const globalBrowser = puppeteer.launch({
     args: [
         '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
@@ -192,6 +193,5 @@ function isCityDataRelevant(cityName) {
 function isUrlDataRelevant(URL) {
     if (!Map_UrlToData.has(URL)) return false;
     let timePassedSinceLastUpdate = Date.now() - Map_UrlToData.get(URL).TIME;
-    if (timePassedSinceLastUpdate < RELEVANT_TIME) return true;
-    else return false;
+    return (timePassedSinceLastUpdate < RELEVANT_TIME)
 }
