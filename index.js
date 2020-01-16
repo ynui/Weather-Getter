@@ -68,7 +68,8 @@ function getWeatherData(city, position) {
         success: function (data) {
             showWheatherData(data, position);
             hideLoader(position);
-            setRecall(position);        },
+            setRecall(position);
+        },
         error: function (err) {
             hideLoader(position);
             handleError(position, city);
@@ -99,8 +100,8 @@ function hideLoader(position) {
 }
 
 function handleError(position, errorData) {
-    if(position == Preset1 || position == Preset2){
-        getWeatherData(PresetCities[position-1], position);
+    if (position == Preset1 || position == Preset2) {
+        getWeatherData(PresetCities[position - 1], position);
     }
     console.log('Error: ' + errorData);
     alert('Could not get ' + errorData);
