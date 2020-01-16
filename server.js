@@ -13,6 +13,11 @@ const RELEVANT_TIME = 5 * MINUTE;
 let Map_CitynameToUrl = new Map();
 let Map_UrlToData = new Map();
 
+const globalBrowser = puppeteer.launch({
+    args: [
+        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+    ]
+});
 
 server.get('/', (request, response) => {
     response.sendFile(path.join(__dirname + '/index.html'));
@@ -58,7 +63,7 @@ server.get('/getWeatherData', (request, response) => {
             console.log(cityName, 'request succeeded');
         } catch (err) {
             response.status(500).send();
-            // console.log(err);
+            console.log(err);
             console.log(cityName, 'request failed');
         }
     };
@@ -67,11 +72,7 @@ server.get('/getWeatherData', (request, response) => {
 
 async function getDataByCity(cityName) {
     if (isCityDataRelevant(cityName)) return getDatabaseDataByCity(cityName);
-    const browser = await puppeteer.launch({
-        args: [
-            '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
-        ]
-    });
+    const browser = await globalBrowser;
     const page = await browser.newPage();
     try {
         let URL = await getUrlByCity(cityName, page);
@@ -81,7 +82,6 @@ async function getDataByCity(cityName) {
         throw ex;
     } finally {
         await page.close();
-        await browser.close();
     }
 }
 
