@@ -11,7 +11,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "install": "^0.13.0",
-    "npm": "^6.13.6",
+    "npm": "^6.14.6",
     "puppeteer": "^2.0.0"
   },
   "devDependencies": {},
